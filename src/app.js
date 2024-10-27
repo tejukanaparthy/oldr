@@ -1,43 +1,29 @@
-/**
- * Express webserver / controller
- */
-
-// import express
 const express = require('express');
+const session = require('express-session');
+const flash = require('connect-flash');
+const bodyParser = require('body-parser');
+const path = require('path');
+const usersRouter = require('./routes/usersRoutes'); // Import user routes
 
-// import the cors -cross origin resource sharing- module
-const cors = require('cors');
+const app = express();
 
-// create a new express app
-const webapp = express();
+// Middleware setup
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({ secret: 'your_secret', resave: false, saveUninitialized: true }));
+app.use(flash());
+app.use(express.static('public')); // Serve static files
 
+// Use user routes
+app.use('/', usersRouter); // This should include the login route
 
-// enable cors
-webapp.use(cors());
-
-// configure express to parse request bodies
-webapp.use(express.urlencoded({extended: true}));
-// import routes handlers
-const { loginUser, registerUser } = require('./routes/usersRoutes')
-
-// root endpoint route
-webapp.get('/', (_req, resp) =>{
-    resp.json({message: 'hello HS4SWE friends!!!'})
+app.get('/', (req, res) => {
+    res.render('welcome', { title: 'Welcome' }); // Render welcome page
 });
 
-
-/**
- * Login endpoint
- * 
- */
-webapp.post('/login', loginUser);
-
-
-/**
- * route implementation POST /user
- * 
- */
-webapp.post('/user', registerUser);
-
-// export the webapp
-module.exports = webapp;
+// Start the server
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});

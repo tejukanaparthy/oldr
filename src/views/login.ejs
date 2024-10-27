@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+</head>
+<body>
+    <h1>Login</h1>
+    <% if (messages.length) { %>
+        <ul>
+            <% messages.forEach(message => { %>
+                <li><%= message %></li>
+            <% }); %>
+        </ul>
+    <% } %>
+    <form action="/login" method="POST">
+        <label for="email">Email:</label>
+        <input type="email" name="email" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" required>
+        <br>
+        <button type="submit">Log In</button>
+    </form>
+</body>
+</html>
