@@ -1,34 +1,31 @@
-const bcrypt = require('bcryptjs');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-// Dummy database for example
-const users = [];
-
-class User {
-    constructor(firstname, lastname, email, password) {
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.email = email;
-        this.password = password; // Store hashed password
-    }
-
-    static emailExists(email) {
-        return users.some(user => user.email === email);
-    }
-
-    static register(firstname, lastname, email, password) {
-        const hashedPassword = bcrypt.hashSync(password, 8);
-        const newUser = new User(firstname, lastname, email, hashedPassword);
-        users.push(newUser);
-        return true;
-    }
-
-    static getByAuth(email, password) {
-        const user = users.find(user => user.email === email);
-        if (user && bcrypt.compareSync(password, user.password)) {
-            return user;
-        }
-        return null;
-    }
-}
+const User = sequelize.define('User', {
+  firstname: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  lastname: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+    validate: {
+      isEmail: true,
+    },
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  role: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
 
 module.exports = User;
