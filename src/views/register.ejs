@@ -1,34 +1,46 @@
-<%- include('partials/header', { title: 'User Registration' }) %>
+<%- include('partials/header', { title: 'User Registration', user: user }) %>
 
-<% if (typeof error !== 'undefined' && error) { %>
-  <p class="error"><%= error %></p>
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
 <% } %>
 
-<% if (typeof success !== 'undefined' && success) { %>
-  <p class="success"><%= success %></p>
+<% if (success) { %>
+  <div class="alert alert-success"><%= success %></div>
 <% } %>
 
 <form action="/api/users/register" method="POST">
-  <label for="firstname">First Name:</label>
-  <input type="text" id="firstname" name="firstname" required>
+  <div class="mb-3">
+    <label for="firstname" class="form-label">First Name:</label>
+    <input type="text" class="form-control" id="firstname" name="firstname" required>
+  </div>
 
-  <label for="lastname">Last Name:</label>
-  <input type="text" id="lastname" name="lastname" required>
+  <div class="mb-3">
+    <label for="lastname" class="form-label">Last Name:</label>
+    <input type="text" class="form-control" id="lastname" name="lastname" required>
+  </div>
 
-  <label for="email">Email:</label>
-  <input type="email" id="email" name="email" required>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email:</label>
+    <input type="email" class="form-control" id="email" name="email" required>
+  </div>
 
-  <label for="password">Password:</label>
-  <input type="password" id="password" name="password" required>
+  <div class="mb-3">
+    <label for="password" class="form-label">Password:</label>
+    <input type="password" class="form-control" id="password" name="password" required>
+  </div>
 
-  <label for="role">Role:</label>
-  <select id="role" name="role" required>
-    <option value="user">User</option>
-    <option value="admin">Admin</option>
-  </select>
+  <div class="mb-3">
+    <label for="role" class="form-label">Role:</label>
+    <select class="form-select" id="role" name="role" required>
+      <option value="">Select Role</option>
+      <option value="user">User</option>
+      <option value="admin">Admin</option>
+    </select>
+  </div>
 
-  <button type="submit">Register</button>
+  <button type="submit" class="btn btn-primary">Register</button>
 </form>
 
-<%- include('partials/footer') %>
+<p class="mt-3">Already have an account? <a href="/api/users/login">Login here</a>.</p>
 
+<%- include('partials/footer') %>

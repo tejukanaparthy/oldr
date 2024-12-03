@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Welcome</title>
-</head>
-<body>
-    <h1>Welcome to the User Management System</h1>
-    <a href="/login">Login</a>
-    <a href="/register">Register</a>
-</body>
-</html>
+<%- include('partials/header', { title: 'Welcome to OLDR', user: user }) %>
 
+<div class="alert alert-success">
+  Welcome to OLDR, the chat service for the elderly, <strong><%= user.firstname %> <%= user.lastname %></strong>!
+</div>
+
+<!-- Future chat functionalities can be added here -->
+
+<%- include('partials/footer') %>
