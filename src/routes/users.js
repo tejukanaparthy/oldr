@@ -1,31 +1,49 @@
 const bcrypt = require('bcryptjs');
-const pool = require('../db'); // Ensure this path is correct
+const db = require('../config/database'); // Adjust the path as necessary
+module.exports = User;
 
 class User {
-    static async emailExists(email) {
-        const res = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        return res.rowCount > 0; // Return true if email exists
+    static emailExists(email) {
+        return new Promise((resolve, reject) => {
+            const query = 'SELECT COUNT(*) AS count FROM users WHERE email = ?';
+            db.get(query, [email], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row.count > 0);
+                }
+            });
+        });
     }
 
-    static async register(firstname, lastname, email, password) {
+    static register(firstname, lastname, email, password) {
         const hashedPassword = bcrypt.hashSync(password, 8);
-        await pool.query(
-            'INSERT INTO users (firstname, lastname, email, password) VALUES ($1, $2, $3, $4)',
-            [firstname, lastname, email, hashedPassword]
-        );
-        return true; // Optionally return the new user object
+        return new Promise((resolve, reject) => {
+            const query = 'INSERT INTO users (firstname, lastname, email, password) VALUES (?, ?, ?, ?)';
+            db.run(query, [firstname, lastname, email, hashedPassword], function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
     }
 
-    static async getByAuth(email, password) {
-        const res = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        const user = res.rows[0];
-
-        if (user && bcrypt.compareSync(password, user.password)) {
-            return user; // Return user if email matches and password is correct
-        }
-        return null; // user not found or password incorrect
+    static getByAuth(email, password) {
+        return new Promise((resolve, reject) => {
+            const query = 'SELECT * FROM users WHERE email = ?';
+            db.get(query, [email], (err, user) => {
+                if (err) {
+                    reject(err);
+                } else if (user && bcrypt.compareSync(password, user.password)) {
+                    resolve(user);
+                } else {
+                    resolve(null);
+                }
+            });
+        });
     }
 }
 
-module.exports = User;
 

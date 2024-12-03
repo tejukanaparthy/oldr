@@ -1,20 +1,22 @@
 {
   "name": "hs4swe_fa24_project",
   "version": "1.0.0",
-  "description": "fall 24 project",
-  "main": "index.js",
+  "description": "Fall 24 project",
+  "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "tba"
+    "url": "https://github.com/yourusername/hs4swe_fa24_project.git"
   },
   "keywords": [
     "node.js",
     "express",
-    "mongidb",
+    "sqlite",
+    "authentication",
     "MERN"
   ],
   "author": "hs4swe",
@@ -23,14 +25,16 @@
     "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.6",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
     "express-session": "^1.18.1",
     "express-validator": "^7.2.0",
-    "mongodb": "^6.5.0",
-    "pg": "^8.13.1",
-    "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.5"
+    "jsonwebtoken": "^9.0.2",
+    "sequelize": "^6.37.5",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }

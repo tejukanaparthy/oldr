@@ -1,38 +1,57 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const session = require('express-session');
-const flash = require('connect-flash');
-const usersRouter = require('./routes/usersRoutes'); // Ensure this path is correct
+const userRoutes = require('./routes/userRoutes');
+const sequelize = require('./config/database');
+const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
 // Set EJS as the templating engine
 app.set('view engine', 'ejs');
-app.set('views', __dirname + '/views'); // Set the views directory
+app.set('views', path.join(__dirname, 'views'));
 
-// Middleware
-app.use(express.urlencoded({ extended: true })); // To parse URL-encoded bodies
-app.use(express.static('public')); // Serve static files
+// Middleware for parsing request bodies
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-// Set up session middleware
-app.use(session({
-    secret: 'your_secret', // Replace with a strong secret
+// Configure session middleware
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'default_secret', // Use a strong secret in production
     resave: false,
-    saveUninitialized: true
-}));
+    saveUninitialized: false,
+  })
+);
 
-// Initialize connect-flash
-app.use(flash());
-
-// Define the home route
-app.get('/', (req, res) => {
-    res.send('Welcome to the homepage!'); // You can render a view instead
+// Make user data available in all views
+app.use((req, res, next) => {
+  res.locals.user = req.session.user;
+  next();
 });
 
-// Use user routes
-app.use('/', usersRouter);
+// Routes
+app.use('/api/users', userRoutes);
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+// Serve static files (optional, for CSS/JS if needed)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Home route (redirect to login)
+app.get('/', (req, res) => {
+  res.redirect('/api/users/login');
+});
+
+// Start the server and synchronize the database
+app.listen(PORT, async () => {
+  console.log(`Server is running on port ${PORT}`);
+  try {
+    await sequelize.sync(); // Removed { force: true } to prevent data loss
+    console.log('Database synchronized');
+  } catch (error) {
+    console.error('Unable to synchronize the database:', error);
+  }
 });

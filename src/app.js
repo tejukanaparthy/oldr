@@ -1,25 +1,53 @@
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const flash = require('connect-flash');
-const bodyParser = require('body-parser');
 const path = require('path');
-const usersRouter = require('./routes/usersRoutes'); // Import user routes
+const usersRouter = require('./routes/userRoutes');
 
 const app = express();
+
+
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('./database.db', (err) => {
+    if (err) {
+        console.error('Error opening database:', err.message);
+    } else {
+        console.log('Connected to the SQLite database.');
+    }
+});
+
 
 // Middleware setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: 'your_secret', resave: false, saveUninitialized: true }));
-app.use(flash());
-app.use(express.static('public')); // Serve static files
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Use user routes
-app.use('/', usersRouter); // This should include the login route
+// Session configuration
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 1000 // 1 hour
+    }
+}));
+
+// Flash messages
+app.use(flash());
+app.use((req, res, next) => {
+    res.locals.messages = req.flash();
+    next();
+});
+
+// Routes
+app.use('/', usersRouter);
 
 app.get('/', (req, res) => {
-    res.render('welcome', { title: 'Welcome' }); // Render welcome page
+    res.render('welcome', { title: 'Welcome' });
 });
 
 // Start the server
