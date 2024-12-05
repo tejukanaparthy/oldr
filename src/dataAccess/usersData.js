@@ -182,4 +182,60 @@ const addUser = async (newUser) => {
     updateUser,
     deleteUser,
   };
+
+  /**
+ * CREATE a new request from an old person
+ * @param {*} userId - the ID of the user making the request
+ * @param {*} description - the description of the request
+ * @returns the ID of the created request
+ * @throws an error if the operation fails
+ */
+const saveRequest = async (userId, description) => {
+  try {
+      // get the db
+      const db = await getDB();
+      const request = {
+          userId: new ObjectId(userId),
+          description: description,
+          status: 'pending', // Default status
+          priority: false,   // Default priority
+          createdAt: new Date(), // Timestamp
+      };
+      const result = await db.collection('requests').insertOne(request);
+      console.log(`New request created with id: ${result.insertedId}`);
+      return result.insertedId;
+  } catch (err) {
+      console.log(`error: ${err.message}`);
+      throw new Error("Request not created");
+  } finally {
+      // close the resources/connections
+      await closeMongoDBConnection();
+  }
+};
+
+/**
+ * READ all requests
+ * @returns the list of all requests
+ * @throws an error if the operation fails
+ */
+const getRequests = async () => {
+  try {
+      const db = await getDB();
+      const result = await db.collection('requests').find({}).toArray(); // Retrieve all requests
+      console.log(`Requests fetched: ${JSON.stringify(result)}`);
+      return result;
+  } catch (err) {
+      console.log(`error: ${err.message}`);
+      throw new Error('Cannot fetch requests');
+  } finally {
+      await closeMongoDBConnection();
+  }
+};
+
+module.exports = {
+  saveRequest,
+  getRequests, // Export the new function
+};
+
+
   

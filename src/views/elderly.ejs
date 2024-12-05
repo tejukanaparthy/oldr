@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Elderly Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, <%= user.firstname %>!</h1>
+    <form action="/api/users/requests" method="POST">
+        <label for="description">Write your request:</label>
+        <textarea id="description" name="description" rows="4" cols="50" required></textarea>
+        <button type="submit">Submit</button>
+    </form>    
+
+    <h2>Your Requests</h2>
+<ul>
+    <% if (requests && requests.length > 0) { %>
+        <% requests.forEach(request => { %>
+            <li>
+                <%= request.description %> - <%= request.status %>
+                <% if (request.priority) { %>
+                    <span style="color: red;">(Important)</span>
+                <% } %>
+            </li>
+        <% }) %>
+    <% } else { %>
+        <p>No requests found.</p>
+    <% } %>
+</ul>
+
+</body>
+</html>

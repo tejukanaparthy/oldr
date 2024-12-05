@@ -2,9 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const userRoutes = require('./routes/userRoutes');
-const sequelize = require('./config/database');
 const path = require('path');
 const dotenv = require('dotenv');
+const dbUtils = require('./utils/dbUtils'); // Ensure consistent db connection
 
 dotenv.config();
 
@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 // Configure session middleware
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'default_secret', // Use a strong secret in production
+    secret: process.env.SESSION_SECRET || 'default_secret',
     resave: false,
     saveUninitialized: false,
   })
@@ -37,7 +37,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/users', userRoutes);
 
-// Serve static files (optional, for CSS/JS if needed)
+// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Home route (redirect to login)
@@ -45,13 +45,7 @@ app.get('/', (req, res) => {
   res.redirect('/api/users/login');
 });
 
-// Start the server and synchronize the database
-app.listen(PORT, async () => {
+// Start the server
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  try {
-    await sequelize.sync(); // Removed { force: true } to prevent data loss
-    console.log('Database synchronized');
-  } catch (error) {
-    console.error('Unable to synchronize the database:', error);
-  }
 });

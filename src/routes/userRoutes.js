@@ -1,5 +1,6 @@
 const express = require('express');
 const { registerUser, loginUser, welcomePage, logoutUser } = require('../controllers/userController');
+const dbUtils = require('../utils/dbUtils');
 const { body, validationResult } = require('express-validator');
 
 const router = express.Router();
@@ -10,6 +11,24 @@ const isAuthenticated = (req, res, next) => {
     next();
   } else {
     res.redirect('/api/users/login');
+  }
+};
+
+// Middleware to check if the user is elderly
+const isElderly = (req, res, next) => {
+  if (req.session.user && req.session.user.role === 'elderly') {
+    next();
+  } else {
+    res.status(403).send('Access Denied');
+  }
+};
+
+// Middleware to check if the user is staff
+const isStaff = (req, res, next) => {
+  if (req.session.user && req.session.user.role === 'staff') {
+    next();
+  } else {
+    res.status(403).send('Access Denied');
   }
 };
 
@@ -26,7 +45,7 @@ router.post(
     body('lastname').notEmpty().withMessage('Last name is required'),
     body('email').isEmail().withMessage('Valid email is required'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-    body('role').isIn(['user', 'admin']).withMessage('Role must be either user or admin'),
+    body('role').isIn(['elderly', 'staff']).withMessage('Role must be either elderly or staff'),
   ],
   (req, res, next) => {
     const errors = validationResult(req);
@@ -61,6 +80,81 @@ router.post(
   },
   loginUser
 );
+
+// GET elderly page
+router.get('/elderly', isAuthenticated, isElderly, async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const query = 'SELECT * FROM requests WHERE user_id = ?';
+    const requests = await dbUtils.getAll(query, [userId]);
+    res.render('elderly', { user: req.session.user, requests });
+  } catch (error) {
+    console.error('Error fetching requests:', error.message);
+    res.status(500).send('An error occurred while fetching your requests.');
+  }
+});
+
+// POST submit request
+router.post('/requests', isAuthenticated, isElderly, async (req, res) => {
+  const { description } = req.body;
+  const userId = req.session.user.id;
+
+  try {
+    const query = 'INSERT INTO requests (user_id, description, status, priority) VALUES (?, ?, "pending", false)';
+    await dbUtils.runQuery(query, [userId, description]);
+    res.redirect('/api/users/elderly');
+  } catch (error) {
+    console.error('Error submitting request:', error.message);
+    res.status(500).send('An error occurred while submitting your request.');
+  }
+});
+
+// GET staff page
+router.get('/staff', isAuthenticated, isStaff, async (req, res) => {
+  try {
+    const query = `
+      SELECT requests.id, requests.description, requests.status, requests.priority, users.firstname, users.lastname
+      FROM requests
+      JOIN users ON requests.user_id = users.id
+      ORDER BY requests.priority DESC, requests.created_at ASC
+    `;
+    const requests = await dbUtils.getAll(query);
+    console.log('Requests fetched for staff:', requests); // Debug log
+    res.render('staff', { user: req.session.user, requests });
+  } catch (error) {
+    console.error('Error fetching requests for staff:', error.message);
+    res.status(500).send('An error occurred while fetching requests.');
+  }
+});
+
+
+// POST mark a request as fulfilled
+router.post('/requests/:id/fulfill', isAuthenticated, isStaff, async (req, res) => {
+  const requestId = req.params.id;
+
+  try {
+    const query = 'UPDATE requests SET status = "fulfilled" WHERE id = ?';
+    await dbUtils.runQuery(query, [requestId]);
+    res.redirect('/api/users/staff');
+  } catch (error) {
+    console.error('Error fulfilling request:', error.message);
+    res.status(500).send('An error occurred while fulfilling the request.');
+  }
+});
+
+// POST mark a request as important
+router.post('/requests/:id/important', isAuthenticated, isStaff, async (req, res) => {
+  const requestId = req.params.id;
+
+  try {
+    const query = 'UPDATE requests SET priority = true WHERE id = ?';
+    await dbUtils.runQuery(query, [requestId]);
+    res.redirect('/api/users/staff');
+  } catch (error) {
+    console.error('Error marking request as important:', error.message);
+    res.status(500).send('An error occurred while marking the request as important.');
+  }
+});
 
 // GET welcome page (protected)
 router.get('/welcome', isAuthenticated, welcomePage);

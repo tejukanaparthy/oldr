@@ -1,66 +1,42 @@
-/**
- * This module contains database connection
- * functions.
- * Encapsulation: the db connection is never exported
- */
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 
-// this is a node app, we must use commonJS modules/ require
+const dbPath = path.join(__dirname, '../../db/database.db'); // Ensure this points to db/database.db
+console.log('Using database file at:', dbPath); // Debug log
 
-// import the env variables
-require('dotenv').config();
-
-// import the mongodb driver
-const { MongoClient } = require('mongodb');
-
-
-// the mongodb server URL
-const dbURL = process.env.DB_URL;
-
-
-//MongoDB database connection
-let MongoConnection;
-
-/**
- * SRP: connects to MongoDB and return the connection handle 
- */
-
-// connection to the db
-const connect = async () => {
-  // always use try/catch to handle any exception
-  try {
-    MongoConnection = (await MongoClient.connect(
-      dbURL)); // we return the entire connection, not just the DB
-    // check that we are connected to the db
-    console.log(`connected to db: ${MongoConnection.db().databaseName}`);
-    return MongoConnection;
-  } catch (err) {
-    console.log(err.message);
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('Error connecting to SQLite database:', err.message);
+  } else {
+    console.log('Connected to SQLite database.');
   }
-};
-/**
- *
- * @returns the database attached to this MongoDB connection
- */
-const getDB = async () => {
-  // test if there is an active connection
-  if (!MongoConnection) {
-    await connect();
-  }
-  return MongoConnection.db();
+});
+
+const runQuery = (query, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.run(query, params, function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(this); // 'this' contains the last inserted ID and other metadata
+      }
+    });
+  });
 };
 
-/**
- *
- * Close the mongodb connection
- */
-const closeMongoDBConnection = async () => {
-  if(MongoConnection)
-    await MongoConnection.close();
+const getAll = (query, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.all(query, params, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
 };
 
-// export the functions
 module.exports = {
-    closeMongoDBConnection,
-    getDB,
-    connect,
-  };
+  runQuery,
+  getAll,
+};

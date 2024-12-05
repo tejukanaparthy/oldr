@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, Staff Member <%= user.firstname %>!</h1>
+    <h2>All Requests</h2>
+    <ul>
+        <% if (requests && requests.length > 0) { %>
+            <% requests.forEach(request => { %>
+                <li>
+                    <strong><%= request.firstname %> <%= request.lastname %>:</strong>
+                    <%= request.description %> - <%= request.status %>
+                    <% if (request.priority) { %>
+                        <span style="color: red;">(Important)</span>
+                    <% } %>
+                    <% if (request.status === 'pending') { %>
+                        <form action="/api/users/requests/<%= request.id %>/fulfill" method="POST" style="display:inline;">
+                            <button type="submit">Mark as Fulfilled</button>
+                        </form>
+                        <form action="/api/users/requests/<%= request.id %>/important" method="POST" style="display:inline;">
+                            <button type="submit">Flag as Important</button>
+                        </form>
+                    <% } %>
+                </li>
+            <% }) %>
+        <% } else { %>
+            <p>No requests found.</p>
+        <% } %>
+    </ul>
+</body>
+</html>
