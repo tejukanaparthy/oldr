@@ -116,7 +116,7 @@ router.get('/staff', isAuthenticated, isStaff, async (req, res) => {
       SELECT requests.id, requests.description, requests.status, requests.priority, users.firstname, users.lastname
       FROM requests
       JOIN users ON requests.user_id = users.id
-      ORDER BY requests.priority DESC, requests.created_at ASC
+      ORDER BY requests.status DESC, requests.priority DESC, requests.created_at ASC
     `;
     const requests = await dbUtils.getAll(query);
     console.log('Requests fetched for staff:', requests); // Debug log
@@ -124,6 +124,21 @@ router.get('/staff', isAuthenticated, isStaff, async (req, res) => {
   } catch (error) {
     console.error('Error fetching requests for staff:', error.message);
     res.status(500).send('An error occurred while fetching requests.');
+  }
+});
+
+// POST delete a request
+router.post('/requests/:id/delete', isAuthenticated, isStaff, async (req, res) => {
+  const requestId = req.params.id;
+
+  try {
+    const query = 'DELETE FROM requests WHERE id = ?';
+    await dbUtils.runQuery(query, [requestId]);
+    console.log(`Request with ID ${requestId} deleted`);
+    res.redirect('/api/users/staff');
+  } catch (error) {
+    console.error('Error deleting request:', error.message);
+    res.status(500).send('An error occurred while deleting the request.');
   }
 });
 

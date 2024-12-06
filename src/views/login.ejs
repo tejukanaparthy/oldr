@@ -1,5 +1,36 @@
 <%- include('partials/header', { title: 'User Login', user: user }) %>
 
+<h1 class="mb-4">Login</h1>
+
+<% if (error) { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<% if (success) { %>
+  <div class="alert alert-success"><%= success %></div>
+<% } %>
+
+<form action="/api/users/login" method="POST" class="card p-4">
+  <div class="mb-3">
+    <label for="email" class="form-label">Email:</label>
+    <input type="email" class="form-control" id="email" name="email" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="password" class="form-label">Password:</label>
+    <input type="password" class="form-control" id="password" name="password" required>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Login</button>
+</form>
+
+<p class="mt-3">Don't have an account? <a href="/api/users/register">Register here</a>.</p>
+
+<%- include('partials/footer') %>
+
+
+<!-- <%- include('partials/header', { title: 'User Login', user: user }) %>
+
 <% if (error) { %>
   <div class="alert alert-danger"><%= error %></div>
 <% } %>
@@ -24,4 +55,4 @@
 
 <p class="mt-3">Don't have an account? <a href="/api/users/register">Register here</a>.</p>
 
-<%- include('partials/footer') %>
+<%- include('partials/footer') %> -->

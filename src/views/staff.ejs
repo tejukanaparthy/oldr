@@ -1,34 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Staff Dashboard</title>
-</head>
-<body>
-    <h1>Welcome, Staff Member <%= user.firstname %>!</h1>
-    <h2>All Requests</h2>
-    <ul>
-        <% if (requests && requests.length > 0) { %>
-            <% requests.forEach(request => { %>
-                <li>
-                    <strong><%= request.firstname %> <%= request.lastname %>:</strong>
-                    <%= request.description %> - <%= request.status %>
-                    <% if (request.priority) { %>
-                        <span style="color: red;">(Important)</span>
-                    <% } %>
-                    <% if (request.status === 'pending') { %>
-                        <form action="/api/users/requests/<%= request.id %>/fulfill" method="POST" style="display:inline;">
-                            <button type="submit">Mark as Fulfilled</button>
-                        </form>
-                        <form action="/api/users/requests/<%= request.id %>/important" method="POST" style="display:inline;">
-                            <button type="submit">Flag as Important</button>
-                        </form>
-                    <% } %>
-                </li>
-            <% }) %>
-        <% } else { %>
-            <p>No requests found.</p>
+<%- include('partials/header', { title: 'Staff Dashboard', user: user }) %>
+
+<h1 class="mb-4">Welcome, Staff Member <%= user.firstname %>!</h1>
+
+<h2>All Requests</h2>
+<ul class="list-group">
+  <% if (requests && requests.length > 0) { %>
+    <% requests.forEach(request => { %>
+      <li class="list-group-item">
+        <strong><%= request.firstname %> <%= request.lastname %>:</strong>
+        <%= request.description %> - <strong><%= request.status %></strong>
+        <% if (request.priority) { %>
+          <span class="badge bg-danger">Important</span>
         <% } %>
-    </ul>
-</body>
-</html>
+        <% if (request.status === 'pending') { %>
+          <form action="/api/users/requests/<%= request.id %>/fulfill" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-success btn-sm">Mark as Fulfilled</button>
+          </form>
+          <form action="/api/users/requests/<%= request.id %>/important" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-warning btn-sm">Flag as Important</button>
+          </form>
+        <% } %>
+        <form action="/api/users/requests/<%= request.id %>/delete" method="POST" class="d-inline">
+          <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  <% } else { %>
+    <p>No requests found.</p>
+  <% } %>
+</ul>
+
+<%- include('partials/footer') %>

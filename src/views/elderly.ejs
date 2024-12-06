@@ -1,4 +1,36 @@
-<!DOCTYPE html>
+<%- include('partials/header', { title: 'Elderly Dashboard', user: user }) %>
+
+<h1 class="mb-4">Welcome, <%= user.firstname %>!</h1>
+
+<div class="card p-4 mb-4">
+  <form action="/api/users/requests" method="POST">
+    <div class="mb-3">
+      <label for="description" class="form-label">Write your request:</label>
+      <textarea id="description" name="description" rows="4" class="form-control" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+
+<h2>Your Requests</h2>
+<ul class="list-group">
+  <% if (requests && requests.length > 0) { %>
+    <% requests.forEach(request => { %>
+      <li class="list-group-item">
+        <%= request.description %> - <strong><%= request.status %></strong>
+        <% if (request.priority) { %>
+          <span class="badge bg-danger">Important</span>
+        <% } %>
+      </li>
+    <% }) %>
+  <% } else { %>
+    <p>No requests found.</p>
+  <% } %>
+</ul>
+
+<%- include('partials/footer') %>
+
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -29,4 +61,4 @@
 </ul>
 
 </body>
-</html>
+</html> -->

@@ -4,9 +4,12 @@
   Welcome to OLDR, the chat service for the elderly, <strong><%= user.firstname %> <%= user.lastname %></strong>!
 </div>
 
-<!-- Button to navigate to the elderly page (only visible to elderly users) -->
 <% if (user && user.role === 'elderly') { %>
   <a href="/api/users/elderly" class="btn btn-primary">Go to Elderly Page</a>
+<% } %>
+
+<% if (user && user.role === 'staff') { %>
+  <a href="/api/users/staff" class="btn btn-primary">Go to Staff Dashboard</a>
 <% } %>
 
 <%- include('partials/footer') %>
