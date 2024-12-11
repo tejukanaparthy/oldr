@@ -37,35 +37,50 @@
 
 <%- include('partials/footer') %>
 
-<!-- <form action="/api/users/register" method="POST">
-  <div class="mb-3">
-    <label for="firstname" class="form-label">First Name:</label>
-    <input type="text" class="form-control" id="firstname" name="firstname" required>
-  </div>
+<!-- Speech Synthesis Script for Registration Page (Optional) -->
+<script>
+  const introText = 'Welcome to the registration page. Please fill out all the fields to create your account.';
 
-  <div class="mb-3">
-    <label for="lastname" class="form-label">Last Name:</label>
-    <input type="text" class="form-control" id="lastname" name="lastname" required>
-  </div>
+  const replayButton = document.createElement('button');
+  replayButton.textContent = '🔊 Replay Introduction';
+  replayButton.classList.add('btn', 'btn-primary', 'mt-3');
+  replayButton.setAttribute('aria-label', 'Replay the introduction');
+  document.body.insertBefore(replayButton, document.querySelector('.card'));
 
-  <div class="mb-3">
-    <label for="email" class="form-label">Email:</label>
-    <input type="email" class="form-control" id="email" name="email" required>
-  </div>
+  const muteButton = document.createElement('button');
+  muteButton.textContent = '🔇 Mute Introduction';
+  muteButton.classList.add('btn', 'btn-secondary', 'mt-3', 'ms-2');
+  muteButton.setAttribute('aria-label', 'Mute the introduction');
+  document.body.insertBefore(muteButton, document.querySelector('.card'));
 
-  <div class="mb-3">
-    <label for="password" class="form-label">Password:</label>
-    <input type="password" class="form-control" id="password" name="password" required>
-  </div>
+  let isMuted = false;
 
-  <div class="mb-3">
-    <label for="role" class="form-label">Role:</label>
-    <select class="form-select" id="role" name="role" required>
-      <option value="">Select Role</option>
-      <option value="elderly">Elderly</option>
-      <option value="staff">Staff</option>
-    </select>
-  </div>
+  function speakText(text) {
+    if (!isMuted && 'speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.pitch = 1;
+      utterance.rate = 0.9;
+      speechSynthesis.speak(utterance);
+    }
+  }
 
-  <button type="submit" class="btn btn-primary">Register</button>
-</form> -->
+  window.addEventListener('load', () => {
+    speakText(introText);
+  });
+
+  replayButton.addEventListener('click', () => {
+    speakText(introText);
+  });
+
+  muteButton.addEventListener('click', () => {
+    isMuted = !isMuted;
+    muteButton.textContent = isMuted ? '🔈 Unmute Introduction' : '🔇 Mute Introduction';
+    muteButton.setAttribute('aria-label', isMuted ? 'Unmute the introduction' : 'Mute the introduction');
+
+    if (isMuted) {
+      speechSynthesis.cancel();
+    }
+  });
+
+</script>

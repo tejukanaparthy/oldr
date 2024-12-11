@@ -1,7 +1,5 @@
 <%- include('partials/header', { title: 'User Login', user: user }) %>
 
-<h1 class="mb-4">Login</h1>
-
 <% if (error) { %>
   <div class="alert alert-danger"><%= error %></div>
 <% } %>
@@ -9,6 +7,21 @@
 <% if (success) { %>
   <div class="alert alert-success"><%= success %></div>
 <% } %>
+
+<!-- Voice Introduction Text -->
+<p id="intro-text" class="sr-only">
+  Please enter your email and password to log into your account. If you need assistance, use the voice input feature by clicking the microphone button.
+</p>
+
+<!-- Voice Control Buttons -->
+<div class="controls" style="margin-bottom: 20px; text-align: center;">
+  <button id="replay-voice" class="btn btn-primary" aria-label="Replay the introduction">
+    🔊 Replay Introduction
+  </button>
+  <button id="mute-voice" class="btn btn-secondary" aria-label="Mute the introduction">
+    🔇 Mute Introduction
+  </button>
+</div>
 
 <form action="/api/users/login" method="POST" class="card p-4">
   <div class="mb-3">
@@ -26,33 +39,49 @@
 
 <p class="mt-3">Don't have an account? <a href="/api/users/register">Register here</a>.</p>
 
+<!-- Speech Synthesis Script -->
+<script>
+  // Speech Synthesis for Voice Introduction
+  const introTextElement = document.getElementById('intro-text');
+  const introText = introTextElement ? introTextElement.textContent : '';
+
+  const replayButton = document.getElementById('replay-voice');
+  const muteButton = document.getElementById('mute-voice');
+
+  let isMuted = false;
+
+  function speakText(text) {
+    if (!isMuted && 'speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.pitch = 1;
+      utterance.rate = 0.9;
+      speechSynthesis.speak(utterance);
+    }
+  }
+
+  window.addEventListener('load', () => {
+    if (introText.trim() !== '') {
+      speakText(introText);
+    }
+  });
+
+  replayButton.addEventListener('click', () => {
+    if (introText.trim() !== '') {
+      speakText(introText);
+    }
+  });
+
+  muteButton.addEventListener('click', () => {
+    isMuted = !isMuted;
+    muteButton.textContent = isMuted ? '🔈 Unmute Introduction' : '🔇 Mute Introduction';
+    muteButton.setAttribute('aria-label', isMuted ? 'Unmute the introduction' : 'Mute the introduction');
+
+    if (isMuted) {
+      speechSynthesis.cancel();
+    }
+  });
+</script>
+
 <%- include('partials/footer') %>
 
-
-<!-- <%- include('partials/header', { title: 'User Login', user: user }) %>
-
-<% if (error) { %>
-  <div class="alert alert-danger"><%= error %></div>
-<% } %>
-
-<% if (success) { %>
-  <div class="alert alert-success"><%= success %></div>
-<% } %>
-
-<form action="/api/users/login" method="POST">
-  <div class="mb-3">
-    <label for="email" class="form-label">Email:</label>
-    <input type="email" class="form-control" id="email" name="email" required>
-  </div>
-
-  <div class="mb-3">
-    <label for="password" class="form-label">Password:</label>
-    <input type="password" class="form-control" id="password" name="password" required>
-  </div>
-
-  <button type="submit" class="btn btn-primary">Login</button>
-</form>
-
-<p class="mt-3">Don't have an account? <a href="/api/users/register">Register here</a>.</p>
-
-<%- include('partials/footer') %> -->
