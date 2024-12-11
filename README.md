@@ -136,12 +136,12 @@ NODE_ENV=development
 **start:** Starts the application in production mode.  
 **dev:** Starts the application in development mode using `nodemon`.
 
-## Testing
-
-Run the following command to execute the test suite:
-```bash
-npm test
-```
+## API Testing
+ **Start the Server in Production Mode:**  
+   ```bash
+   npm start
+   ```
+Swagger API documentation available at http://localhost:3000/api-docs
 
 ## Deployment
 
