@@ -1,7 +1,11 @@
 <%- include('partials/header', { title: 'Welcome to OLDR', user: user }) %>
 
 <div class="alert alert-success">
-  Welcome to OLDR, the chat service for the elderly, <strong><%= user.firstname %> <%= user.lastname %></strong>!
+  <% if (user) { %>
+    Welcome to OLDR, the chat service for the elderly, <strong><%= user.firstname %> <%= user.lastname %></strong>!
+  <% } else { %>
+    Welcome to OLDR! Please log in to access your account.
+  <% } %>
 </div>
 
 <% if (user && user.role === 'elderly') { %>
@@ -29,7 +33,6 @@
 
 <!-- Speech Synthesis Script -->
 <script>
-  // Speech Synthesis for Voice Introduction
   const introTextElement = document.getElementById('intro-text');
   const introText = introTextElement ? introTextElement.textContent : '';
 

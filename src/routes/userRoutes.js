@@ -1,9 +1,30 @@
+/* eslint-disable no-console */
+/* eslint-disable consistent-return */
+
 const express = require('express');
 const { registerUser, loginUser, welcomePage, logoutUser } = require('../controllers/userController');
 const dbUtils = require('../utils/dbUtils');
 const { body, validationResult } = require('express-validator');
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: User management and authentication
+ */
+
+/**
+ * @swagger
+ * /api/users/register:
+ *   get:
+ *     summary: Get the registration form
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Registration form rendered
+ */
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req, res, next) => {
@@ -14,6 +35,38 @@ const isAuthenticated = (req, res, next) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/users/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstname:
+ *                 type: string
+ *               lastname:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [elderly, staff]
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       400:
+ *         description: Invalid input
+ */
+
 // Middleware to check if the user is elderly
 const isElderly = (req, res, next) => {
   if (req.session.user && req.session.user.role === 'elderly') {
@@ -22,6 +75,17 @@ const isElderly = (req, res, next) => {
     res.status(403).send('Access Denied');
   }
 };
+
+/**
+ * @swagger
+ * /api/users/login:
+ *   get:
+ *     summary: Get the login form
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Login form rendered
+ */
 
 // Middleware to check if the user is staff
 const isStaff = (req, res, next) => {
@@ -50,12 +114,12 @@ router.post(
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const errorMessages = errors.array().map(err => err.msg).join(', ');
+      const errorMessages = errors.array().map((err) => err.msg).join(', ');
       return res.status(400).render('register', { error: errorMessages, success: null });
     }
     next();
   },
-  registerUser
+  registerUser,
 );
 
 // GET login form
@@ -73,13 +137,26 @@ router.post(
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      const errorMessages = errors.array().map(err => err.msg).join(', ');
+      const errorMessages = errors.array().map((err) => err.msg).join(', ');
       return res.status(400).render('login', { error: errorMessages, success: null });
     }
     next();
   },
-  loginUser
+  loginUser,
 );
+
+/**
+ * @swagger
+ * /api/users/elderly:
+ *   get:
+ *     summary: Get elderly page
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Elderly page fetched
+ *       403:
+ *         description: Access denied
+ */
 
 // GET elderly page
 router.get('/elderly', isAuthenticated, isElderly, async (req, res) => {
@@ -119,7 +196,6 @@ router.get('/staff', isAuthenticated, isStaff, async (req, res) => {
       ORDER BY requests.status DESC, requests.priority DESC, requests.created_at ASC
     `;
     const requests = await dbUtils.getAll(query);
-    console.log('Requests fetched for staff:', requests); // Debug log
     res.render('staff', { user: req.session.user, requests });
   } catch (error) {
     console.error('Error fetching requests for staff:', error.message);
@@ -134,14 +210,12 @@ router.post('/requests/:id/delete', isAuthenticated, isStaff, async (req, res) =
   try {
     const query = 'DELETE FROM requests WHERE id = ?';
     await dbUtils.runQuery(query, [requestId]);
-    console.log(`Request with ID ${requestId} deleted`);
     res.redirect('/api/users/staff');
   } catch (error) {
     console.error('Error deleting request:', error.message);
     res.status(500).send('An error occurred while deleting the request.');
   }
 });
-
 
 // POST mark a request as fulfilled
 router.post('/requests/:id/fulfill', isAuthenticated, isStaff, async (req, res) => {
