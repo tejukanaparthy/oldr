@@ -57,6 +57,7 @@ npm install
 **Step 1:** Initialize the Database.  
 Run the initialization script to set up the database and create the necessary tables.
 ```bash
+cd scripts
 node initDatabase.js
 ```
 
