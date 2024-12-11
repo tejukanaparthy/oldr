@@ -1,189 +1,170 @@
-# OLDR - Chat Service for the Elderly
+# OLDR (Online Elderly Request Dashboard)
 
-Welcome to OLDR, the chat service designed specifically for the elderly. This application allows users to register, log in, and access chat functionalities tailored to their needs.
+OLDR is a web application designed to facilitate communication between elderly users and staff members. It allows elderly users to submit requests, which can then be managed by staff members. The application emphasizes accessibility, security, and ease of use.
 
 ## Table of Contents
 
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
-- [Configuration](#configuration)
+- [Database Setup](#database-setup)
 - [Running the Application](#running-the-application)
-- [Testing the Application](#testing-the-application)
 - [Project Structure](#project-structure)
-- [Technologies Used](#technologies-used)
+- [Environment Variables](#environment-variables)
+- [Scripts](#scripts)
+- [Testing](#testing)
+- [Deployment](#deployment)
 - [Contributing](#contributing)
 - [License](#license)
+- [Acknowledgments](#acknowledgments)
 
 ## Features
 
-- **User Registration:** Allows new users to sign up with their details.
-- **User Login:** Authenticates existing users.
-- **Session Management:** Maintains user sessions across requests.
-- **Welcome Page:** Greets authenticated users with a personalized message.
-- **Logout Functionality:** Allows users to securely log out.
+**User Authentication:** Secure registration and login functionalities for elderly and staff users.  
+**Role-Based Access Control:** Different dashboards and permissions based on user roles.  
+**Request Management:** Elderly users can submit requests, and staff members can manage them (fulfill, flag as important, delete).  
+**Accessibility Enhancements:** Voice input for request submissions and speech synthesis for introductions.  
+**Responsive Design:** Optimized for various devices, ensuring usability across desktops, tablets, and mobile devices.
 
 ## Prerequisites
 
-Before you begin, ensure you have met the following requirements:
+Before setting up the application, ensure you have the following installed on your system:
 
-- **Node.js** (v22.0.0 or later)
-- **npm** (Node Package Manager)
-- **Git**
-- **SQLite3**
-
-### Installing Node.js and npm
-
-Download and install Node.js from [here](https://nodejs.org/). npm is bundled with Node.js.
-
-### Installing Git
-
-Download and install Git from [here](https://git-scm.com/downloads).
-
-### Installing SQLite3
-
-SQLite3 is used as the database for this application.
-
-- **macOS:**
-
-  ```bash
-  brew install sqlite
-  ```
-
-- **Ubuntu:**
-
-  ```bash
-  sudo apt-get install sqlite3 libsqlite3-dev
-  ```
+**Node.js:** [Download here](https://nodejs.org/en/download/) (v14 or later).  
+**npm:** Comes bundled with Node.js.  
+**Git:** [Download here](https://git-scm.com/downloads).  
+**SQLite3:** [Download here](https://www.sqlite.org/download.html) (for database management).
 
 ## Installation
 
-To install OLDR, follow these steps:
+**Step 1:** Clone the Repository.  
+```bash
+git clone https://github.com/yourusername/OLDR.git
+```
 
-1. **Clone the repository:**
+**Step 2:** Navigate to the Project Directory.  
+```bash
+cd OLDR
+```
 
-   ```bash
-   git clone <repository_url>
-   ```
+**Step 3:** Install Dependencies.  
+```bash
+npm install
+```
 
-2. **Navigate to the project directory:**
+## Database Setup
 
-   ```bash
-   cd oldr
-   ```
+**Step 1:** Initialize the Database.  
+Run the initialization script to set up the database and create the necessary tables.
+```bash
+node initDatabase.js
+```
 
-3. **Install dependencies:**
-
-   ```bash
-   npm install
-   ```
-
-## Configuration
-
-1. **Environment Variables:**
-
-   Create a `.env` file in the root directory and add the following environment variables:
-
-   ```env
-   PORT=3000
-   JWT_SECRET=your_secure_jwt_secret_key
-   SESSION_SECRET=your_secure_session_secret
-   DATABASE_URL=sqlite:./database.db
-   ```
-
-2. **Initialize the Database:**
-
-   Run the setup script to create the necessary tables:
-
-   ```bash
-   npm run setup
-   ```
+**Step 2:** Verify Database Creation.  
+Ensure that a `database.db` file is created in the `db/` directory. This file stores all application data.
 
 ## Running the Application
 
-To run the application, use the following command:
+**Step 1:** Start the Server.  
+Run one of the following commands:
 
-```bash
-npm start
+- **Development Mode (with Nodemon):**  
+  ```bash
+  npm run dev
+  ```
+
+- **Production Mode:**  
+  ```bash
+  npm start
+  ```
+
+**Step 2:** Access the Application.  
+Open your web browser and navigate to:  
 ```
-
-The server will start on `http://localhost:3000`.
-
-## Testing the Application
-
-1. **Register a New User:**
-
-   Navigate to `http://localhost:3000/register` to register a new user.
-
-2. **Log in:**
-
-   Go to `http://localhost:3000/login` to log in with your credentials.
-
-3. **Welcome Page:**
-
-   After logging in, you will be redirected to a welcome page.
+http://localhost:3000
+```
 
 ## Project Structure
 
-```plaintext
-oldr/
+```
+OLDR/
 ├── src/
-│   ├── index.js            # Main server file
-│   ├── routes/
-│   │   └── userRoutes.js   # User-related routes (registration, login)
+│   ├── controllers/
+│   │   └── userController.js
 │   ├── models/
-│   │   └── user.js         # User model definition
-│   ├── views/              # EJS templates
+│   │   └── user.js
+│   ├── routes/
+│   │   └── userRoutes.js
+│   ├── utils/
+│   │   └── dbUtils.js
 │   ├── config/
-│   │   └── database.js     # Database connection setup
-│   └── scripts/
-│       └── initDatabase.js # Script to initialize the database
-├── .env                    # Environment variables
-├── package.json            # Project metadata and dependencies
-├── README.md               # Project documentation
-└── database.db             # SQLite database file
+│   │   └── database.js
+│   ├── views/
+│   │   ├── partials/
+│   │   │   ├── header.ejs
+│   │   │   └── footer.ejs
+│   │   ├── login.ejs
+│   │   ├── register.ejs
+│   │   ├── staff.ejs
+│   │   └── welcome.ejs
+│   ├── public/
+│   │   └── (static assets like CSS, JS, images)
+│   ├── index.js
+│   └── initDatabase.js
+├── db/
+│   └── database.db
+├── .env
+├── .gitignore
+├── package.json
+└── README.md
 ```
 
-## Technologies Used
+## Environment Variables
 
-- **Node.js**: JavaScript runtime for server-side development.
-- **Express.js**: Web framework for Node.js.
-- **SQLite3**: Relational database for storing user data.
-- **Sequelize**: ORM for handling database operations.
-- **EJS**: Embedded JavaScript templating for rendering views.
+Create a `.env` file in the root directory of the project and define the following variables:
 
-## Querying the Database (to test to see if everything is working)
+```env
+SESSION_SECRET=your_secure_session_secret
+PORT=3000
+NODE_ENV=development
+```
 
-To query the SQLite database directly in the terminal, follow these steps:
+## Scripts
 
-1. **Open the SQLite shell:**
+**test:** Runs tests using Jest.  
+**start:** Starts the application in production mode.  
+**dev:** Starts the application in development mode using `nodemon`.
 
+## Testing
+
+Run the following command to execute the test suite:
+```bash
+npm test
+```
+
+## Deployment
+
+1. **Prepare Environment:** Ensure that all environment variables are set.  
+2. **Deploy to Hosting Provider:** Choose a provider such as Heroku or AWS.  
+3. **Start the Server in Production Mode:**  
    ```bash
-   sqlite3 database.db
-   ```
-
-2. **View all tables:**
-
-   ```sql
-   .tables
-   ```
-
-3. **Query data from a table (e.g., Users table):**
-
-   ```sql
-   SELECT * FROM Users;
-   ```
-
-4. **Exit the SQLite shell:**
-
-   ```sql
-   .exit
+   npm start
    ```
 
 ## Contributing
 
-To contribute to OLDR, fork the repository and create a pull request. For major changes, please open an issue to discuss what you would like to change.
+1. Fork the repository.  
+2. Create a new branch.  
+3. Make changes and commit them.  
+4. Push to your fork and submit a pull request.
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the [ISC License](https://opensource.org/licenses/ISC).
+
+## Acknowledgments
+
+- [Express.js](https://expressjs.com/): Web framework for Node.js.  
+- [EJS](https://ejs.co/): Templating engine.  
+- [SQLite](https://www.sqlite.org/index.html): Lightweight database.  
+- [Bootstrap](https://getbootstrap.com/): CSS framework.  
