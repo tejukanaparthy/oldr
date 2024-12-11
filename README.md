@@ -57,6 +57,7 @@ npm install
 **Step 1:** Initialize the Database.  
 Run the initialization script to set up the database and create the necessary tables.
 ```bash
+cd scripts
 node initDatabase.js
 ```
 
@@ -135,12 +136,12 @@ NODE_ENV=development
 **start:** Starts the application in production mode.  
 **dev:** Starts the application in development mode using `nodemon`.
 
-## Testing
-
-Run the following command to execute the test suite:
-```bash
-npm test
-```
+## API Testing
+ **Start the Server in Production Mode:**  
+   ```bash
+   npm start
+   ```
+Swagger API documentation available at http://localhost:3000/api-docs
 
 ## Deployment
 
