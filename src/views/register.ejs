@@ -5,22 +5,34 @@
 <form action="/api/users/register" method="POST" class="card p-4">
   <div class="mb-3">
     <label for="firstname" class="form-label">First Name:</label>
-    <input type="text" class="form-control" id="firstname" name="firstname" required>
+    <div class="input-group">
+      <input type="text" class="form-control" id="firstname" name="firstname" required>
+      <button type="button" class="btn btn-outline-secondary" id="firstname-voice-btn">🎙️</button>
+    </div>
   </div>
 
   <div class="mb-3">
     <label for="lastname" class="form-label">Last Name:</label>
-    <input type="text" class="form-control" id="lastname" name="lastname" required>
+    <div class="input-group">
+      <input type="text" class="form-control" id="lastname" name="lastname" required>
+      <button type="button" class="btn btn-outline-secondary" id="lastname-voice-btn">🎙️</button>
+    </div>
   </div>
 
   <div class="mb-3">
     <label for="email" class="form-label">Email:</label>
-    <input type="email" class="form-control" id="email" name="email" required>
+    <div class="input-group">
+      <input type="email" class="form-control" id="email" name="email" required>
+      <button type="button" class="btn btn-outline-secondary" id="email-voice-btn">🎙️</button>
+    </div>
   </div>
 
   <div class="mb-3">
     <label for="password" class="form-label">Password:</label>
-    <input type="password" class="form-control" id="password" name="password" required>
+    <div class="input-group">
+      <input type="password" class="form-control" id="password" name="password" required>
+      <button type="button" class="btn btn-outline-secondary" id="password-voice-btn">🎙️</button>
+    </div>
   </div>
 
   <div class="mb-3">
@@ -37,8 +49,48 @@
 
 <%- include('partials/footer') %>
 
-<!-- Speech Synthesis Script for Registration Page (Optional) -->
+<!-- Voice-to-Text and Speech Synthesis Script -->
 <script>
+  /* eslint-env browser */
+  /* eslint-disable no-console */
+
+  // Fields for voice-to-text functionality
+  const fields = [
+    { id: 'firstname', buttonId: 'firstname-voice-btn' },
+    { id: 'lastname', buttonId: 'lastname-voice-btn' },
+    { id: 'email', buttonId: 'email-voice-btn' },
+    { id: 'password', buttonId: 'password-voice-btn' },
+  ];
+
+  // Check if SpeechRecognition is supported
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('Voice-to-text is not supported in this browser. Please use the latest version of Chrome or Edge.');
+  } else {
+    fields.forEach((field) => {
+      const inputField = document.getElementById(field.id);
+      const voiceButton = document.getElementById(field.buttonId);
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+
+      voiceButton.addEventListener('click', () => {
+        recognition.start();
+      });
+
+      recognition.onresult = (event) => {
+        const spokenText = event.results[0][0].transcript;
+        inputField.value = spokenText;
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        alert('An error occurred during voice input. Please try again.');
+      };
+    });
+  }
+
+  // Speech Synthesis for Registration Introduction
   const introText = 'Welcome to the registration page. Please fill out all the fields to create your account.';
 
   const replayButton = document.createElement('button');
@@ -83,4 +135,5 @@
     }
   });
 
+  /* eslint-enable no-console */
 </script>

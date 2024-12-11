@@ -11,6 +11,7 @@
 <!-- Voice Introduction Text -->
 <p id="intro-text" class="sr-only">
   Please enter your email and password to log into your account.
+</p>
 
 <!-- Voice Control Buttons -->
 <div class="controls" style="margin-bottom: 20px; text-align: center;">
@@ -25,12 +26,18 @@
 <form action="/api/users/login" method="POST" class="card p-4">
   <div class="mb-3">
     <label for="email" class="form-label">Email:</label>
-    <input type="email" class="form-control" id="email" name="email" required>
+    <div class="input-group">
+      <input type="email" class="form-control" id="email" name="email" required>
+      <button type="button" class="btn btn-outline-secondary" id="email-voice-btn">🎙️</button>
+    </div>
   </div>
 
   <div class="mb-3">
     <label for="password" class="form-label">Password:</label>
-    <input type="password" class="form-control" id="password" name="password" required>
+    <div class="input-group">
+      <input type="password" class="form-control" id="password" name="password" required>
+      <button type="button" class="btn btn-outline-secondary" id="password-voice-btn">🎙️</button>
+    </div>
   </div>
 
   <button type="submit" class="btn btn-primary">Login</button>
@@ -38,9 +45,46 @@
 
 <p class="mt-3">Don't have an account? <a href="/api/users/register">Register here</a>.</p>
 
-<!-- Speech Synthesis Script -->
+<!-- Voice-to-Text and Speech Synthesis Script -->
 <script>
-  // Speech Synthesis for Voice Introduction
+  /* eslint-env browser */
+  /* eslint-disable no-console */
+
+  // Voice-to-Text Fields
+  const fields = [
+    { id: 'email', buttonId: 'email-voice-btn' },
+    { id: 'password', buttonId: 'password-voice-btn' },
+  ];
+
+  // Check if SpeechRecognition is supported
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('Voice-to-text is not supported in this browser. Please use the latest version of Chrome or Edge.');
+  } else {
+    fields.forEach((field) => {
+      const inputField = document.getElementById(field.id);
+      const voiceButton = document.getElementById(field.buttonId);
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+
+      voiceButton.addEventListener('click', () => {
+        recognition.start();
+      });
+
+      recognition.onresult = (event) => {
+        const spokenText = event.results[0][0].transcript;
+        inputField.value = spokenText;
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        alert('An error occurred during voice input. Please try again.');
+      };
+    });
+  }
+
+  // Speech Synthesis for Login Introduction
   const introTextElement = document.getElementById('intro-text');
   const introText = introTextElement ? introTextElement.textContent : '';
 
@@ -80,7 +124,8 @@
       speechSynthesis.cancel();
     }
   });
+
+  /* eslint-enable no-console */
 </script>
 
 <%- include('partials/footer') %>
-
