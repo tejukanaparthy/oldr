@@ -1,0 +1,17 @@
+<%- include('partials/header', { title: 'Your Requests:', user: user }) %>
+
+<ul class="list-group">
+  <% if (elderlyRequests && elderlyRequests.length > 0) { %>
+    <% elderlyRequests.forEach(request => { %>
+      <li class="list-group-item">
+        <%= request.description %> - <strong><%= request.status %></strong>
+        <% if (request.priority) { %>
+          <span class="badge bg-danger">Important</span>
+        <% } %>
+      </li>
+    <% }) %>
+  <% } else { %>
+    <p>No requests found.</p>
+  <% } %>
+</ul>
+<%- include('partials/footer') %>

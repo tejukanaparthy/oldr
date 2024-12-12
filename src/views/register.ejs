@@ -5,34 +5,22 @@
 <form action="/api/users/register" method="POST" class="card p-4">
   <div class="mb-3">
     <label for="firstname" class="form-label">First Name:</label>
-    <div class="input-group">
-      <input type="text" class="form-control" id="firstname" name="firstname" required>
-      <button type="button" class="btn btn-outline-secondary" id="firstname-voice-btn">🎙️</button>
-    </div>
+    <input type="text" class="form-control" id="firstname" name="firstname" required>
   </div>
 
   <div class="mb-3">
     <label for="lastname" class="form-label">Last Name:</label>
-    <div class="input-group">
-      <input type="text" class="form-control" id="lastname" name="lastname" required>
-      <button type="button" class="btn btn-outline-secondary" id="lastname-voice-btn">🎙️</button>
-    </div>
+    <input type="text" class="form-control" id="lastname" name="lastname" required>
   </div>
 
   <div class="mb-3">
     <label for="email" class="form-label">Email:</label>
-    <div class="input-group">
-      <input type="email" class="form-control" id="email" name="email" required>
-      <button type="button" class="btn btn-outline-secondary" id="email-voice-btn">🎙️</button>
-    </div>
+    <input type="email" class="form-control" id="email" name="email" required>
   </div>
 
   <div class="mb-3">
     <label for="password" class="form-label">Password:</label>
-    <div class="input-group">
-      <input type="password" class="form-control" id="password" name="password" required>
-      <button type="button" class="btn btn-outline-secondary" id="password-voice-btn">🎙️</button>
-    </div>
+    <input type="password" class="form-control" id="password" name="password" required>
   </div>
 
   <div class="mb-3">
@@ -49,91 +37,3 @@
 
 <%- include('partials/footer') %>
 
-<!-- Voice-to-Text and Speech Synthesis Script -->
-<script>
-  /* eslint-env browser */
-  /* eslint-disable no-console */
-
-  // Fields for voice-to-text functionality
-  const fields = [
-    { id: 'firstname', buttonId: 'firstname-voice-btn' },
-    { id: 'lastname', buttonId: 'lastname-voice-btn' },
-    { id: 'email', buttonId: 'email-voice-btn' },
-    { id: 'password', buttonId: 'password-voice-btn' },
-  ];
-
-  // Check if SpeechRecognition is supported
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    alert('Voice-to-text is not supported in this browser. Please use the latest version of Chrome or Edge.');
-  } else {
-    fields.forEach((field) => {
-      const inputField = document.getElementById(field.id);
-      const voiceButton = document.getElementById(field.buttonId);
-
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'en-US';
-
-      voiceButton.addEventListener('click', () => {
-        recognition.start();
-      });
-
-      recognition.onresult = (event) => {
-        const spokenText = event.results[0][0].transcript;
-        inputField.value = spokenText;
-      };
-
-      recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        alert('An error occurred during voice input. Please try again.');
-      };
-    });
-  }
-
-  // Speech Synthesis for Registration Introduction
-  const introText = 'Welcome to the registration page. Please fill out all the fields to create your account.';
-
-  const replayButton = document.createElement('button');
-  replayButton.textContent = '🔊 Replay Introduction';
-  replayButton.classList.add('btn', 'btn-primary', 'mt-3');
-  replayButton.setAttribute('aria-label', 'Replay the introduction');
-  document.body.insertBefore(replayButton, document.querySelector('.card'));
-
-  const muteButton = document.createElement('button');
-  muteButton.textContent = '🔇 Mute Introduction';
-  muteButton.classList.add('btn', 'btn-secondary', 'mt-3', 'ms-2');
-  muteButton.setAttribute('aria-label', 'Mute the introduction');
-  document.body.insertBefore(muteButton, document.querySelector('.card'));
-
-  let isMuted = false;
-
-  function speakText(text) {
-    if (!isMuted && 'speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      utterance.pitch = 1;
-      utterance.rate = 0.9;
-      speechSynthesis.speak(utterance);
-    }
-  }
-
-  window.addEventListener('load', () => {
-    speakText(introText);
-  });
-
-  replayButton.addEventListener('click', () => {
-    speakText(introText);
-  });
-
-  muteButton.addEventListener('click', () => {
-    isMuted = !isMuted;
-    muteButton.textContent = isMuted ? '🔈 Unmute Introduction' : '🔇 Mute Introduction';
-    muteButton.setAttribute('aria-label', isMuted ? 'Unmute the introduction' : 'Mute the introduction');
-
-    if (isMuted) {
-      speechSynthesis.cancel();
-    }
-  });
-
-  /* eslint-enable no-console */
-</script>

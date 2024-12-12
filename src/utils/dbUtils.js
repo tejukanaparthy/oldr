@@ -1,27 +1,15 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-/**
- * Constructs the absolute path to the SQLite database file.
- * Adjust the path according to your project structure.
- */
-const dbPath = path.join(__dirname, '../../db/database.db'); // Ensure this points to db/database.db
-console.log('Using database file at:', dbPath); // Debug log
+const dbPath = path.join(__dirname, '../../db/database.db');
 
-// Initialize the SQLite database connection
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error connecting to SQLite database:', err.message);
-  } else {
-    console.log('Connected to SQLite database.');
-  }
-});
+const db = new sqlite3.Database(dbPath);
 
 /**
- * Executes a run query (INSERT, UPDATE, DELETE) and returns the result.
- * @param {string} query - The SQL query to execute.
- * @param {Array} params - The parameters for the SQL query.
- * @returns {Promise<Object>} - Resolves with the statement context.
+ * Executes a query on the SQLite database.
+ * @param {string} query - The SQL query to be executed.
+ * @param {Array} [params=[]] - The parameters to bind to the query.
+ * @returns {Promise<sqlite3.RunResult>} Resolves with the result of the query.
  */
 const runQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
@@ -36,10 +24,10 @@ const runQuery = (query, params = []) => {
 };
 
 /**
- * Executes a SELECT query and returns all matching rows.
- * @param {string} query - The SQL query to execute.
- * @param {Array} params - The parameters for the SQL query.
- * @returns {Promise<Array>} - Resolves with an array of rows.
+ * Fetches all rows from the SQLite database that match the query.
+ * @param {string} query - The SQL query to retrieve rows.
+ * @param {Array} [params=[]] - The parameters to bind to the query.
+ * @returns {Promise<Object[]>} Resolves with an array of rows returned by the query.
  */
 const getAll = (query, params = []) => {
   return new Promise((resolve, reject) => {

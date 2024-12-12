@@ -1,0 +1,18 @@
+<%- include('partials/header', { title: 'Fulfilled Requests:', user: user }) %>
+<ul>
+  <% if (requests.length) { %>
+    <% requests.forEach(request => { %>
+      <li>
+        <strong><%= request.firstname %> <%= request.lastname %>:</strong>
+        <%= request.description %> - <%= request.status %>
+        <span class="badge bg-success">Fulfilled</span>
+        <form action="/api/users/requests/<%= request.id %>/delete" method="POST">
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  <% } else { %>
+    <p>No fulfilled requests found.</p>
+  <% } %>
+</ul>
+<%- include('partials/footer') %>

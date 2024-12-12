@@ -1,0 +1,23 @@
+<%- include('partials/header', { title: 'Important Requests:', user: user }) %>
+<ul>
+  <% if (requests.length) { %>
+    <% requests.forEach(request => { %>
+      <li>
+        <strong><%= request.firstname %> <%= request.lastname %>:</strong>
+        <%= request.description %> - <%= request.status %>
+        <span class="badge bg-danger">Important</span>
+        <% if (request.status === 'pending') { %>
+          <form action="/api/users/requests/<%= request.id %>/fulfill" method="POST">
+            <button type="submit">Fulfill</button>
+          </form>
+        <% } %>
+        <form action="/api/users/requests/<%= request.id %>/delete" method="POST">
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  <% } else { %>
+    <p>No important requests found.</p>
+  <% } %>
+</ul>
+<%- include('partials/footer') %>

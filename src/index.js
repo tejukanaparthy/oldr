@@ -1,110 +1,76 @@
-require('dotenv').config(); // Load environment variables from .env file
-const express = require('express');
-const session = require('express-session');
-const flash = require('connect-flash');
-const path = require('path');
-const bodyParser = require('body-parser'); // Middleware for parsing request bodies
-const swaggerUi = require('swagger-ui-express');
-const swaggerJsDoc = require('swagger-jsdoc');
-const initDatabase = require('../scripts/initDatabase'); // Ensure this path is correct
-const userRoutes = require('./routes/userRoutes');
+const express = require("express");
+const bodyParser = require("body-parser");
+const session = require("express-session");
+const userRoutes = require("./routes/userRoutes");
+const path = require("path");
+const dotenv = require("dotenv");
+// const dbUtils = require("./utils/dbUtils"); 
 
-// Initialize the app
+dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Debug: Log database initialization
-console.log('Initializing database...');
-initDatabase();
-console.log('Database initialized.');
+/**
+ * Sets up the templating engine to use EJS for rendering views.
+ * @function
+ * @returns {void}
+ */
+app.set("view engine", "ejs"); // Set EJS as the templating engine
+app.set("views", path.join(__dirname, "views")); // Specify the views directory
 
-// Swagger setup
-const swaggerOptions = {
-  swaggerDefinition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'User Management API',
-      version: '1.0.0',
-      description: 'API for user management and authentication',
-      contact: {
-        name: 'Camden Chin',
-        email: 'camden.chin@example.com',
-      },
-    },
-    servers: [
-      {
-        url: `http://localhost:${PORT}`,
-      },
-    ],
-  },
-  apis: ['./src/routes/userRoutes.js'], // Adjust this path based on your project structure
-};
+/**
+ * Middleware to parse URL-encoded and JSON request bodies.
+ * @function
+ * @returns {void}
+ */
+app.use(bodyParser.urlencoded({ extended: false })); // Parse URL-encoded data
+app.use(bodyParser.json()); // Parse JSON data
 
-// Generate Swagger docs
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-
-// Debug: Print the generated Swagger docs to console
-console.log('Generated Swagger Docs:', JSON.stringify(swaggerDocs, null, 2));
-
-// Set up Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-console.log('Swagger UI available at /api-docs');
-
-// Set EJS as the templating engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views')); // Define the views directory
-
-// Middleware for parsing request bodies
-app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
-app.use(bodyParser.json()); // Parse JSON bodies
-console.log('Body parsers set up.');
-
-// Serve static files
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static assets
-console.log('Static files served from public directory.');
-
-// Session configuration
+/**
+ * Configures session middleware for session management.
+ * @function
+ * @returns {void}
+ */
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'default_secret', // Secret for signing the session ID cookie
-    resave: false, // Don't save session if unmodified
-    saveUninitialized: false, // Don't create session until something stored
-    cookie: {
-      httpOnly: true, // Mitigate XSS attacks by preventing client-side scripts from accessing the cookie
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-      maxAge: 60 * 60 * 1000, // 1 hour in milliseconds
-    },
+    secret: process.env.SESSION_SECRET || "default_secret", // Session secret from environment variable or default
+    resave: false, // Don't save the session if it hasn't been modified
+    saveUninitialized: false, // Don't create a session until something is stored
   })
 );
-console.log('Session middleware configured.');
 
-// Flash messages setup
-app.use(flash()); // Initialize flash messaging
+/**
+ * Makes user data available in all views by attaching it to res.locals.
+ * @function
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ * @returns {void}
+ */
 app.use((req, res, next) => {
-  res.locals.messages = req.flash(); // Make flash messages available in all views
-  next();
-});
-console.log('Flash messages middleware set up.');
-
-// Make user data available in all views
-app.use((req, res, next) => {
-  console.log('Session user:', req.session.user); // Debug: Log user session data
-  res.locals.user = req.session.user || null; // Ensure user is always defined
-  next();
+  res.locals.user = req.session.user; // Attach user data from the session to res.locals
+  next(); // Move to the next middleware or route handler
 });
 
-// Define application routes
-app.use('/api/users', userRoutes); // Use user routes for all paths under /api/users
-console.log('Routes set up for /api/users');
+// Routes
+app.use("/api/users", userRoutes); // Mount user routes at '/api/users'
 
-// Home route - Redirect to login
-app.get('/', (req, res) => {
-  console.log('Home route accessed - redirecting to login'); // Debug: Log home route access
-  res.redirect('/api/users/login'); // Redirect to login page
-});
+/**
+ * Serves static files (e.g., images, CSS, JavaScript).
+ * @function
+ * @returns {void}
+ */
+app.use(express.static(path.join(__dirname, "public"))); // Serve static files from the 'public' directory
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  console.log(`Swagger API documentation available at http://localhost:${PORT}/api-docs`);
+/**
+ * Home route, redirects the user to the login page.
+ * @function
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {void}
+ */
+app.get("/", (req, res) => {
+  res.redirect("/api/users/login"); // Redirect to the login page
 });
+app.listen(PORT);

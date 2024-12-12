@@ -1,6 +1,12 @@
-<%- include('partials/header', { title: 'Staff Dashboard', user: user }) %>
+<%- include('partials/header', { title: 'Staff Dashboard:', user: user }) %>
 
 <h1 class="mb-4">Welcome, Staff Member <%= user.firstname %>!</h1>
+
+<!-- Add navigation buttons for Important and Fulfilled Requests at the top -->
+<div class="mb-3">
+  <a href="/api/users/staff/important" class="btn btn-warning btn-lg">Important Requests</a>
+  <a href="/api/users/staff/fulfilled" class="btn btn-success btn-lg">Fulfilled Requests</a>
+</div>
 
 <h2>All Requests</h2>
 <ul class="list-group">
@@ -9,9 +15,12 @@
       <li class="list-group-item">
         <strong><%= request.firstname %> <%= request.lastname %>:</strong>
         <%= request.description %> - <strong><%= request.status %></strong>
+        
         <% if (request.priority) { %>
           <span class="badge bg-danger">Important</span>
         <% } %>
+
+        <!-- Only show the buttons if the request is pending -->
         <% if (request.status === 'pending') { %>
           <form action="/api/users/requests/<%= request.id %>/fulfill" method="POST" class="d-inline">
             <button type="submit" class="btn btn-success btn-sm">Mark as Fulfilled</button>
@@ -20,6 +29,8 @@
             <button type="submit" class="btn btn-warning btn-sm">Flag as Important</button>
           </form>
         <% } %>
+
+        <!-- Form to delete a request -->
         <form action="/api/users/requests/<%= request.id %>/delete" method="POST" class="d-inline">
           <button type="submit" class="btn btn-danger btn-sm">Delete</button>
         </form>

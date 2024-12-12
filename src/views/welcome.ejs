@@ -1,11 +1,7 @@
 <%- include('partials/header', { title: 'Welcome to OLDR', user: user }) %>
 
 <div class="alert alert-success">
-  <% if (user) { %>
-    Welcome to OLDR, the chat service for the elderly, <strong><%= user.firstname %> <%= user.lastname %></strong>!
-  <% } else { %>
-    Welcome to OLDR! Please log in to access your account.
-  <% } %>
+  Welcome to OLDR, the chat service for the elderly, <strong><%= user.firstname %> <%= user.lastname %></strong>!
 </div>
 
 <% if (user && user.role === 'elderly') { %>
@@ -16,59 +12,4 @@
   <a href="/api/users/staff" class="btn btn-primary">Go to Staff Dashboard</a>
 <% } %>
 
-<!-- Voice Introduction Text -->
-<p id="intro-text" class="sr-only">
-  Welcome to OLDR. Depending on your role, you can navigate to the Elderly Page or Staff Dashboard using the buttons provided.
-</p>
-
-<!-- Voice Control Buttons -->
-<div class="controls" style="margin-top: 20px; text-align: center;">
-  <button id="replay-voice" class="btn btn-primary" aria-label="Replay the introduction">
-    🔊 Replay Introduction
-  </button>
-  <button id="mute-voice" class="btn btn-secondary" aria-label="Mute the introduction">
-    🔇 Mute Introduction
-  </button>
-</div>
-
-<!-- Speech Synthesis Script -->
-<script>
-  const introTextElement = document.getElementById('intro-text');
-  const introText = introTextElement ? introTextElement.textContent : '';
-
-  const replayButton = document.getElementById('replay-voice');
-  const muteButton = document.getElementById('mute-voice');
-
-  let isMuted = false;
-
-  function speakText(text) {
-    if (!isMuted && 'speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      utterance.pitch = 1;
-      utterance.rate = 0.9;
-      speechSynthesis.speak(utterance);
-    }
-  }
-
-  window.addEventListener('load', () => {
-    speakText(introText);
-  });
-
-  replayButton.addEventListener('click', () => {
-    speakText(introText);
-  });
-
-  muteButton.addEventListener('click', () => {
-    isMuted = !isMuted;
-    muteButton.textContent = isMuted ? '🔈 Unmute Introduction' : '🔇 Mute Introduction';
-    muteButton.setAttribute('aria-label', isMuted ? 'Unmute the introduction' : 'Mute the introduction');
-
-    if (isMuted) {
-      speechSynthesis.cancel();
-    }
-  });
-</script>
-
 <%- include('partials/footer') %>
-
